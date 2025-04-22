@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: discussion
+  cassandra:
+    keyspace-name: keyspace_name
+    contact-points: localhost
+    port: 9042
+    local-datacenter: datacenter1  # Укажите ваш дата-центр
+server:
+  port: 24130
+
+

@@ -1,0 +1,14 @@
+com\example\discussion\mapper\NoticeDtoImpl.class
+com\example\discussion\DiscussionApplication.class
+com\example\discussion\mapper\NoticeDto.class
+com\example\discussion\model\NoticeKey.class
+com\example\discussion\model\Notice$In.class
+com\example\discussion\model\Notice$NoticeBuilder.class
+com\example\discussion\model\Notice.class
+com\example\discussion\model\Notice$In$InBuilder.class
+com\example\discussion\service\IdGeneratorService.class
+com\example\discussion\model\Notice$Out$OutBuilder.class
+com\example\discussion\controller\NoticeController.class
+com\example\discussion\service\NoticeService.class
+com\example\discussion\model\Notice$Out.class
+com\example\discussion\repo\NoticeRepo.class

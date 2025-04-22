@@ -1,0 +1,149 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: generated
+      changes:
+        - createTable:
+            tableName: tbl_creator
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: login
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: firstname
+                  type: VARCHAR(255)
+              - column:
+                  name: lastname
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: 2
+      author: generated
+      changes:
+        - createTable:
+            tableName: tbl_mark
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    unique: true
+
+  - changeSet:
+      id: 3
+      author: generated
+      changes:
+        - createTable:
+            tableName: tbl_story
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: creator_id
+                  type: BIGINT
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: TEXT
+              - column:
+                  name: created
+                  type: TIMESTAMP
+              - column:
+                  name: modified
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 4
+      author: generated
+      changes:
+        - createTable:
+            tableName: tbl_notice
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: story_id
+                  type: BIGINT
+              - column:
+                  name: content
+                  type: TEXT
+
+  - changeSet:
+      id: 5
+      author: generated
+      changes:
+        - createTable:
+            tableName: tbl_storymark
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: story_id
+                  type: BIGINT
+              - column:
+                  name: mark_id
+                  type: BIGINT
+
+  - changeSet:
+      id: 6
+      author: generated
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: tbl_storymark
+            baseColumnNames: story_id
+            referencedTableName: tbl_story
+            referencedColumnNames: id
+            constraintName: fk_storymark_story
+            onDelete: CASCADE
+            onUpdate: CASCADE
+
+  - changeSet:
+      id: 7
+      author: generated
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: tbl_storymark
+            baseColumnNames: mark_id
+            referencedTableName: tbl_mark
+            referencedColumnNames: id
+            constraintName: fk_storymark_mark
+            onDelete: CASCADE
+            onUpdate: CASCADE
+
+  - changeSet:
+      id: 8
+      author: generated
+      changes:
+        - addUniqueConstraint:
+            tableName: tbl_storymark
+            columnNames: story_id, mark_id
+            constraintName: uk_storymark_unique
