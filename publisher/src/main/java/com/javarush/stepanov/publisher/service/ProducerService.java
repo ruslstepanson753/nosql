@@ -9,6 +9,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public class ProducerService {
@@ -17,13 +20,15 @@ public class ProducerService {
 
     private final KafkaTemplate<String, Kafka> kafkaTemplate;
 
+    private final KafkaResponseService responseService;
 
     @Value("${topic.name}")
     private String topicName;
 
-    public ProducerService(NoticeDto mapper, NoticeDto mapper1, KafkaTemplate<String, Kafka> kafkaTemplate) {
+    public ProducerService(NoticeDto mapper, NoticeDto mapper1, KafkaTemplate<String, Kafka> kafkaTemplate, KafkaResponseService kafkaResponseService) {
         this.mapper = mapper1;
         this.kafkaTemplate = kafkaTemplate;
+        this.responseService = kafkaResponseService;
     }
 
     public void sendMessage(String key, Kafka message) {
@@ -40,5 +45,35 @@ public class ProducerService {
         kafka.setState(state);
         sendMessage(String.valueOf(id),kafka);
         return mapper.fromKafka(kafka);
+    }
+
+    public Notice.Out kafkaGet(Long id) throws Exception {
+        Kafka kafka = new Kafka();
+        String method = "GET";
+        String state = "PENDING";
+        kafka.setId(id);
+        kafka.setMethod(method);
+        kafka.setState(state);
+        // Создаём будущий результат до отправки сообщения
+        CompletableFuture<Kafka> futureResponse = responseService.createPendingRequest(id);
+        // Отправляем сообщение
+        sendMessage(String.valueOf(id), kafka);
+        try {
+            // Ждём ответ максимум 1 секунду
+            Kafka response = futureResponse.get(1, TimeUnit.SECONDS);
+
+            // Проверяем статус ответа
+            if ("ERROR".equals(response.getState())) {
+                throw new RuntimeException("Ошибка при получении данных для id=" + id);
+            }
+
+            // Преобразуем результат через маппер
+            return mapper.fromKafka(response);
+        } catch (TimeoutException e) {
+            throw new RuntimeException("Превышено время ожидания ответа");
+        } finally {
+            // На всякий случай удаляем запрос из ожидающих
+            responseService.pendingRequests.remove(id);
+        }
     }
 }

@@ -9,8 +9,7 @@ public interface NoticeDto {
     Notice.Out out(Notice entity);
 
     Notice in(Notice.In inputDto);
-
-    Notice.In toInFromKafka(Kafka kafka);
+    Kafka toKafkaFromOut(Notice.Out out);
 
     Notice toNoticeFromKafka(Kafka kafka);
 

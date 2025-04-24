@@ -12,6 +12,7 @@ com\javrush\stepanov\discussion\DiscussionApplication.class
 com\javrush\stepanov\discussion\repo\NoticeCassandraRepository.class
 com\javrush\stepanov\discussion\model\State.class
 com\javrush\stepanov\discussion\config\KafkaConfigDiscussion.class
+com\javrush\stepanov\discussion\service\ProducerService.class
 com\javrush\stepanov\discussion\mapper\NoticeDto.class
 com\javrush\stepanov\discussion\model\Kafka.class
 com\javrush\stepanov\discussion\service\ConsumerServiceDisc.class

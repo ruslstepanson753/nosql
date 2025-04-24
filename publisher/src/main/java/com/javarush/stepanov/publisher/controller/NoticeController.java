@@ -38,16 +38,8 @@ public class NoticeController {
     }
 
     @GetMapping("/{id}")
-    public Notice.Out getNoticeById(@PathVariable Long id) {
-        return webClient.get()
-                .uri("/api/v1.0/notices/{id}", id)
-                .retrieve()
-                .onStatus(
-                        status -> status == HttpStatus.NOT_FOUND || status == HttpStatus.BAD_REQUEST,
-                        response -> Mono.error(new RuntimeException("Error: " + response.statusCode()))
-                )
-                .bodyToMono(new ParameterizedTypeReference<Notice.Out>() {})
-                .block(); // Block to get the result
+    public Notice.Out getNoticeById(@PathVariable Long id) throws Exception {
+        return kafkaProducerService.kafkaGet(id);
     }
 
     @GetMapping

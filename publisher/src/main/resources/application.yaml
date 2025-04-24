@@ -19,6 +19,8 @@ spring:
     default-schema: public
   kafka:
     bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notice-consumer-group
 server:
   port: 24110
 topic:

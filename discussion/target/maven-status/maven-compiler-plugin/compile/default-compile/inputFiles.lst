@@ -2,11 +2,12 @@ C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\
 C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\mapper\NoticeDto.java
 C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\model\Notice.java
 C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\model\State.java
-C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\repo\NoticeCassandraRepository.java
-C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\service\NoticeServiceDisc.java
 C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\service\ConsumerServiceDisc.java
-C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\model\Method.java
 C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\config\KafkaConfigDiscussion.java
 C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\DiscussionApplication.java
-C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\model\Kafka.java
 C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\model\NoticeKey.java
+C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\repo\NoticeCassandraRepository.java
+C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\service\NoticeServiceDisc.java
+C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\model\Method.java
+C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\service\ProducerService.java
+C:\projects\spring\MVC\discussion\src\main\java\com\javrush\stepanov\discussion\model\Kafka.java
