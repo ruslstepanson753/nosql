@@ -1,6 +1,7 @@
 package com.javrush.stepanov.discussion.service;
 
 import com.javrush.stepanov.discussion.mapper.NoticeDto;
+import com.javrush.stepanov.discussion.model.Kafka;
 import com.javrush.stepanov.discussion.model.Notice;
 import com.javrush.stepanov.discussion.model.NoticeKey;
 import com.javrush.stepanov.discussion.repo.NoticeCassandraRepository;
@@ -14,12 +15,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class NoticeService {
+public class NoticeServiceDisc {
 
     private final NoticeCassandraRepository repo;
     private final NoticeDto mapper;
 
-    public NoticeService(NoticeCassandraRepository repo, NoticeDto mapper) {
+    public NoticeServiceDisc(NoticeCassandraRepository repo, NoticeDto mapper) {
         this.repo = repo;
         this.mapper = mapper;
     }
@@ -51,6 +52,18 @@ public class NoticeService {
         Long storyId = input.getStoryId();
         NoticeKey noticeKey = new NoticeKey(country,id,storyId);
         Notice notice = mapper.in(input);
+        notice.setKey(noticeKey);
+        return mapper.out(
+                repo.save(notice));
+
+    }
+
+    public Notice.Out create(Kafka input) {
+        String country = "RU";
+        Long id = input.getId();
+        Long storyId = input.getStoryId();
+        NoticeKey noticeKey = new NoticeKey(country,id,storyId);
+        Notice notice = mapper.toNoticeFromKafka(input);
         notice.setKey(noticeKey);
         return mapper.out(
                 repo.save(notice));

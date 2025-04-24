@@ -23,8 +23,6 @@ public class Notice {
 
     private String content;
 
-    private State state;
-
     // Геттеры для удобства
     public String getCountry() {
         return key.getCountry();

@@ -1,5 +1,6 @@
 package com.javarush.stepanov.publisher.mapper;
 
+import com.javarush.stepanov.publisher.model.notice.Kafka;
 import com.javarush.stepanov.publisher.model.notice.Notice;
 import org.mapstruct.Mapper;
 
@@ -9,5 +10,8 @@ public interface NoticeDto {
 
     Notice in(Notice.In inputDto);
 
+    Kafka kafkaFromIn(Notice.In kafkaDto);
+
+    Notice.Out fromKafka(Kafka kafkaDto);
 
 }

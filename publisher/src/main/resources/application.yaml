@@ -22,7 +22,7 @@ spring:
 server:
   port: 24110
 topic:
-  name: In4
+  name: InTopic
 
 
 

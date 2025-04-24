@@ -46,6 +46,4 @@ public class Notice {
         String content;
     }
 
-
-
 }

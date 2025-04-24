@@ -4,6 +4,7 @@ import com.javarush.stepanov.publisher.model.notice.Kafka;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
@@ -16,11 +17,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaConfig {
+public class KafkaConfigPublisher {
+
+    @Value("${topic.name}")
+    private String topicName;
 
     @Bean
     public NewTopic topic() {
-        return TopicBuilder.name("${topic.name}")
+        return TopicBuilder.name(topicName)
                 .partitions(10)
                 .replicas(1)
                 .build();
@@ -37,6 +41,7 @@ public class KafkaConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false); // 👈 отключаем __TypeId__
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 }

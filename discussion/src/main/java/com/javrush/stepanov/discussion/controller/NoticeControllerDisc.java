@@ -1,7 +1,7 @@
 package com.javrush.stepanov.discussion.controller;
 
 import com.javrush.stepanov.discussion.model.Notice;
-import com.javrush.stepanov.discussion.service.NoticeService;
+import com.javrush.stepanov.discussion.service.NoticeServiceDisc;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +17,9 @@ import java.util.NoSuchElementException;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1.0/notices")  // Изменил путь для соответствия запросам от 24110
-public class NoticeController {
+public class NoticeControllerDisc {
 
-    private final NoticeService service;
+    private final NoticeServiceDisc service;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

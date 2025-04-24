@@ -11,8 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.support.mapping.DefaultJackson2JavaTypeMapper;
-import org.springframework.kafka.support.mapping.Jackson2JavaTypeMapper.TypePrecedence;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
@@ -20,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaConfig {
+public class KafkaConfigDiscussion {
 
     @Bean
     public NewTopic topic() {
@@ -54,14 +52,8 @@ public class KafkaConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
         JsonDeserializer<Kafka> deserializer = new JsonDeserializer<>(Kafka.class, false);
-        deserializer.setRemoveTypeHeaders(false);
-        deserializer.addTrustedPackages("*"); // доверяем всем пакетам
-        deserializer.setTypeMapper(new DefaultJackson2JavaTypeMapper() {{
-            setTypePrecedence(TypePrecedence.TYPE_ID);
-            setIdClassMapping(Map.of(
-                    "com.javarush.stepanov.publisher.model.notice.Kafka", Kafka.class
-            ));
-        }});
+        deserializer.addTrustedPackages("*");
+        deserializer.setRemoveTypeHeaders(true); // 👈 важно, чтобы не искал __TypeId__
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
