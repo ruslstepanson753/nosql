@@ -6,7 +6,11 @@ spring:
     contact-points: localhost
     port: 9042
     local-datacenter: datacenter1  # Укажите ваш дата-центр
+  kafka:
+    bootstrap-servers: localhost:9092
 server:
   port: 24130
+topic:
+  name: In4
 
 

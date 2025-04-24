@@ -17,7 +17,12 @@ spring:
     user: postgres
     password: postgres
     default-schema: public
+  kafka:
+    bootstrap-servers: localhost:9092
 server:
   port: 24110
+topic:
+  name: In4
+
 
 
