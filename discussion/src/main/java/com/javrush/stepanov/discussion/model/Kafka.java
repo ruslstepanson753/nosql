@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Builder
@@ -13,17 +14,16 @@ import java.io.Serializable;
 @AllArgsConstructor
 public  class Kafka implements Serializable {
     Long id;
-    Long storyId;
-    String content;
     String method;
     String state;
+
+    Notice.Out notice;
+    List<Notice.Out> notices;
 
     @Override
     public String toString() {
         return "Kafka{" +
                 "id=" + id +
-                ", storyId=" + storyId +
-                ", content='" + content + '\'' +
                 ", method=" + method +
                 ", state=" + state +
                 '}';

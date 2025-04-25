@@ -1,7 +1,6 @@
 com\javrush\stepanov\discussion\model\Notice.class
 com\javrush\stepanov\discussion\model\Notice$Out$OutBuilder.class
 com\javrush\stepanov\discussion\service\NoticeServiceDisc.class
-com\javrush\stepanov\discussion\model\Method.class
 com\javrush\stepanov\discussion\model\Kafka$KafkaBuilder.class
 com\javrush\stepanov\discussion\model\Notice$In.class
 com\javrush\stepanov\discussion\model\Notice$Out.class
@@ -10,7 +9,6 @@ com\javrush\stepanov\discussion\model\Notice$In$InBuilder.class
 com\javrush\stepanov\discussion\model\Notice$NoticeBuilder.class
 com\javrush\stepanov\discussion\DiscussionApplication.class
 com\javrush\stepanov\discussion\repo\NoticeCassandraRepository.class
-com\javrush\stepanov\discussion\model\State.class
 com\javrush\stepanov\discussion\config\KafkaConfigDiscussion.class
 com\javrush\stepanov\discussion\service\ProducerService.class
 com\javrush\stepanov\discussion\mapper\NoticeDto.class

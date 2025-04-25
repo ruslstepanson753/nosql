@@ -1,6 +1,5 @@
 package com.javrush.stepanov.discussion.mapper;
 
-import com.javrush.stepanov.discussion.model.Kafka;
 import com.javrush.stepanov.discussion.model.Notice;
 import org.mapstruct.Mapper;
 
@@ -9,10 +8,8 @@ public interface NoticeDto {
     Notice.Out out(Notice entity);
 
     Notice in(Notice.In inputDto);
-    Kafka toKafkaFromOut(Notice.Out out);
 
-    Notice toNoticeFromKafka(Kafka kafka);
-
+    Notice toNoticeFromOut(Notice.Out outDto);
 
 
 }

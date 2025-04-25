@@ -39,12 +39,12 @@ public class ConsumerServiceDisc {
                 case "GET":
                     Long id = kafka.getId();
                     Notice.Out noticeOut = noticeServiceDisc.get(id);
-
                     // Создаём объект ответа на основе полученной сущности
-                    Kafka response = mapper.toKafkaFromOut(noticeOut);
+                    Kafka response = new Kafka();
                     response.setId(id);
                     response.setMethod(method);
                     response.setState("COMPLETED");
+                    response.setNotice(noticeOut);
                     // Отправляем ответ в другой топик
                     producerService.sendMessage(String.valueOf(id), response);
                     break;

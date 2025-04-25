@@ -36,15 +36,17 @@ public class ProducerService {
     }
 
     public Notice.Out kafkaPost(Notice.In input) {
-        Kafka kafka = mapper.kafkaFromIn(input);
+        Kafka kafka = new Kafka();
         Long id = UUID.randomUUID().getMostSignificantBits();
         String method = "POST";
         String state = "PENDING";
+        Notice.Out out = mapper.getOutFromIn(input);
         kafka.setId(id);
         kafka.setMethod(method);
         kafka.setState(state);
+        kafka.setNotice(out);
         sendMessage(String.valueOf(id),kafka);
-        return mapper.fromKafka(kafka);
+        return out;
     }
 
     public Notice.Out kafkaGet(Long id) throws Exception {
@@ -68,7 +70,7 @@ public class ProducerService {
             }
 
             // Преобразуем результат через маппер
-            return mapper.fromKafka(response);
+            return response.getNotice();
         } catch (TimeoutException e) {
             throw new RuntimeException("Превышено время ожидания ответа");
         } finally {

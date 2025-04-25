@@ -58,12 +58,13 @@ public class NoticeServiceDisc {
 
     }
 
-    public Notice.Out create(Kafka input) {
+    public Notice.Out create(Kafka kafka) {
         String country = "RU";
-        Long id = input.getId();
-        Long storyId = input.getStoryId();
+        Long id = kafka.getId();
+        Notice.Out noticeOut = kafka.getNotice();
+        Long storyId = noticeOut.getStoryId();
         NoticeKey noticeKey = new NoticeKey(country,id,storyId);
-        Notice notice = mapper.toNoticeFromKafka(input);
+        Notice notice = mapper.toNoticeFromOut(noticeOut);
         notice.setKey(noticeKey);
         return mapper.out(
                 repo.save(notice));

@@ -10,8 +10,6 @@ public interface NoticeDto {
 
     Notice in(Notice.In inputDto);
 
-    Kafka kafkaFromIn(Notice.In kafkaDto);
-
-    Notice.Out fromKafka(Kafka kafkaDto);
+    Notice.Out getOutFromIn (Notice.In inputDto);
 
 }
