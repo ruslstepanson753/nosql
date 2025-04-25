@@ -86,7 +86,8 @@ public class NoticeServiceDisc {
     }
 
     public void delete(Long id) {
-
+        Notice notice = repo.findOneByKeyId(id).orElseThrow();
+        repo.delete(notice);
     }
 
 }

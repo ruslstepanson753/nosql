@@ -11,5 +11,7 @@ public interface NoticeDto {
 
     Notice toNoticeFromOut(Notice.Out outDto);
 
+    Notice.In toInFromOut(Notice.Out outDto);
+
 
 }

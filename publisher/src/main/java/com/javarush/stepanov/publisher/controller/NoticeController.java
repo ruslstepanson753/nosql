@@ -38,21 +38,14 @@ public class NoticeController {
     }
 
     @GetMapping("/{id}")
-    public Notice.Out getNoticeById(@PathVariable Long id) throws Exception {
+    public Notice.Out getNoticeById(@PathVariable Long id) {
         return kafkaProducerService.kafkaGet(id);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Mono<List<Notice.Out>> getAllNotices() {
-        return webClient.get()
-                .uri("/api/v1.0/notices")
-                .retrieve()
-                .onStatus(
-                        status -> status == HttpStatus.NOT_FOUND || status == HttpStatus.BAD_REQUEST,
-                        response -> Mono.error(new RuntimeException("Error: " + response.statusCode()))
-                )
-                .bodyToMono(new ParameterizedTypeReference<List<Notice.Out>>() {});
+    public List<Notice.Out> getAllNotices() {
+        return kafkaProducerService.kafkaGetAll();
     }
 
     @PostMapping
@@ -65,25 +58,12 @@ public class NoticeController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Notice.Out  updateNotice(@RequestBody @Valid Notice.In input) {
-        return webClient.put()
-                .uri("/api/v1.0/notices")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(input)
-                .retrieve()
-                .bodyToMono(Notice.Out.class)
-                .onErrorMap(e -> {
-                    log.error("Forwarding error", e);
-                    return new ResponseStatusException(
-                            HttpStatus.BAD_GATEWAY,
-                            "Remote service error: " + e.getMessage()
-                    );
-                }).block();
+        return kafkaProducerService.kafkaPut(input);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> deleteNotice(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    public Notice.Out deleteNotice(@PathVariable Long id) {
+        return kafkaProducerService.kafkaDelete(id);
     }
 }

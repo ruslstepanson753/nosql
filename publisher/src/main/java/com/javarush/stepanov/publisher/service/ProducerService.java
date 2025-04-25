@@ -3,13 +3,14 @@ package com.javarush.stepanov.publisher.service;
 import com.javarush.stepanov.publisher.mapper.NoticeDto;
 import com.javarush.stepanov.publisher.model.notice.Kafka;
 import com.javarush.stepanov.publisher.model.notice.Notice;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -36,45 +37,93 @@ public class ProducerService {
     }
 
     public Notice.Out kafkaPost(Notice.In input) {
-        Kafka kafka = new Kafka();
-        Long id = UUID.randomUUID().getMostSignificantBits();
+        long id = Math.abs(UUID.randomUUID().getMostSignificantBits());
         String method = "POST";
         String state = "PENDING";
         Notice.Out out = mapper.getOutFromIn(input);
-        kafka.setId(id);
-        kafka.setMethod(method);
-        kafka.setState(state);
-        kafka.setNotice(out);
+        out.setId(id);
+
+        Kafka kafka = getKafka(id, method, state, out);
         sendMessage(String.valueOf(id),kafka);
         return out;
     }
 
-    public Notice.Out kafkaGet(Long id) throws Exception {
-        Kafka kafka = new Kafka();
+    public Notice.Out kafkaGet(Long id) {
         String method = "GET";
         String state = "PENDING";
+
+        Kafka kafka = getKafka(id, method, state, null);
+        return getOut(id, kafka);
+    }
+
+    public List<Notice.Out> kafkaGetAll() {
+        Long id = UUID.randomUUID().getMostSignificantBits();
+        String method = "GET_ALL";
+        String state = "PENDING";
+
+        Kafka kafka = getKafka(id, method, state, null);
+        return getOuts(id, kafka);
+    }
+
+    public Notice.Out kafkaPut(Notice.In input) {
+        Long id = input.getId();
+        String method = "PUT";
+        String state = "PENDING";
+        Notice.Out out = mapper.getOutFromIn(input);
+
+        Kafka kafka = getKafka(id, method, state, out);
+        return getOut(id, kafka);
+    }
+
+    public Notice.Out kafkaDelete(Long id) {
+        String method = "DELETE";
+        String state = "PENDING";
+
+        Kafka kafka = getKafka(id, method, state, null);
+        return getOut(id, kafka);
+    }
+
+    private static Kafka getKafka(Long id, String method, String state, Notice.Out out) {
+        Kafka kafka = new Kafka();
         kafka.setId(id);
         kafka.setMethod(method);
         kafka.setState(state);
-        // Создаём будущий результат до отправки сообщения
+        kafka.setNotice(out);
+        return kafka;
+    }
+
+    private Notice.Out getOut(Long id, Kafka kafka) {
         CompletableFuture<Kafka> futureResponse = responseService.createPendingRequest(id);
-        // Отправляем сообщение
         sendMessage(String.valueOf(id), kafka);
         try {
-            // Ждём ответ максимум 1 секунду
             Kafka response = futureResponse.get(1, TimeUnit.SECONDS);
-
-            // Проверяем статус ответа
             if ("ERROR".equals(response.getState())) {
                 throw new RuntimeException("Ошибка при получении данных для id=" + id);
             }
-
-            // Преобразуем результат через маппер
             return response.getNotice();
         } catch (TimeoutException e) {
             throw new RuntimeException("Превышено время ожидания ответа");
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
-            // На всякий случай удаляем запрос из ожидающих
+            responseService.pendingRequests.remove(id);
+        }
+    }
+
+    private List<Notice.Out> getOuts(Long id, Kafka kafka) {
+        CompletableFuture<Kafka> futureResponse = responseService.createPendingRequest(id);
+        sendMessage(String.valueOf(id), kafka);
+        try {
+            Kafka response = futureResponse.get(1, TimeUnit.SECONDS);
+            if ("ERROR".equals(response.getState())) {
+                throw new RuntimeException("Ошибка при получении данных для id=" + id);
+            }
+            return response.getNotices();
+        } catch (TimeoutException e) {
+            throw new RuntimeException("Превышено время ожидания ответа");
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
             responseService.pendingRequests.remove(id);
         }
     }
