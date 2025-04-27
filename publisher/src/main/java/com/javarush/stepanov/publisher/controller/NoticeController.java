@@ -2,19 +2,14 @@ package com.javarush.stepanov.publisher.controller;
 
 
 import com.javarush.stepanov.publisher.model.notice.Notice;
-import com.javarush.stepanov.publisher.service.NoticeService;
-import com.javarush.stepanov.publisher.service.ProducerService;
+import com.javarush.stepanov.publisher.service.entityservice.NoticeService;
+import com.javarush.stepanov.publisher.service.kafkaservice.ProducerService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 

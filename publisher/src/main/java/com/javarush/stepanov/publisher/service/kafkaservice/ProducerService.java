@@ -1,4 +1,4 @@
-package com.javarush.stepanov.publisher.service;
+package com.javarush.stepanov.publisher.service.kafkaservice;
 
 import com.javarush.stepanov.publisher.mapper.NoticeDto;
 import com.javarush.stepanov.publisher.model.notice.Kafka;

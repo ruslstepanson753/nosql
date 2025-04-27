@@ -1,14 +1,14 @@
-package com.javarush.stepanov.publisher.service;
+package com.javarush.stepanov.publisher.service.entityservice;
 
 import com.javarush.stepanov.publisher.mapper.StoryDto;
 import com.javarush.stepanov.publisher.model.creator.Creator;
 import com.javarush.stepanov.publisher.model.mark.Mark;
 import com.javarush.stepanov.publisher.model.story.Story;
 import com.javarush.stepanov.publisher.model.storymark.StoryMark;
-import com.javarush.stepanov.publisher.repository.impl.CreatorRepo;
-import com.javarush.stepanov.publisher.repository.impl.MarkRepo;
-import com.javarush.stepanov.publisher.repository.impl.StoryMarkRepo;
-import com.javarush.stepanov.publisher.repository.impl.StoryRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.CreatorRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.MarkRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.StoryMarkRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.StoryRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

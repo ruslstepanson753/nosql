@@ -1,8 +1,9 @@
-package com.javarush.stepanov.publisher.service;
+package com.javarush.stepanov.publisher.service.entityservice;
 
 import com.javarush.stepanov.publisher.mapper.CreatorDto;
 import com.javarush.stepanov.publisher.model.creator.Creator;
-import com.javarush.stepanov.publisher.repository.impl.CreatorRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.CreatorRepo;
+import com.javarush.stepanov.publisher.repository.redisrepo.CreatorRedisRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ public class CreatorService {
 
     private final CreatorRepo repo;
     private final CreatorDto mapper;
+    private final CreatorRedisRepo redisRepo;
 
     public List<Creator.Out> getAll() {
         return repo
@@ -35,10 +37,16 @@ public class CreatorService {
     }
 
     public Creator.Out get(Long id) {
-        return repo
-                .findById(id)
-                .map(mapper::out)
-                .orElseThrow();
+        if (redisRepo.exists(id)) {
+            return redisRepo.findById(id);
+        }else {
+            Creator.Out result = repo
+                    .findById(id)
+                    .map(mapper::out)
+                    .orElseThrow();
+            redisRepo.save(id, result);
+            return result;
+        }
     }
 
     public Creator.Out create(Creator.In input) {

@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Entity
 @Data
 @Builder
@@ -44,7 +46,7 @@ public class Creator {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Out{
+    public static class Out implements Serializable {
         public Long id;
         public String login;
         public String password;

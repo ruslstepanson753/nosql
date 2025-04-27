@@ -1,7 +1,7 @@
 package com.javarush.stepanov.publisher.controller;
 
 import com.javarush.stepanov.publisher.model.story.Story;
-import com.javarush.stepanov.publisher.service.StoryService;
+import com.javarush.stepanov.publisher.service.entityservice.StoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

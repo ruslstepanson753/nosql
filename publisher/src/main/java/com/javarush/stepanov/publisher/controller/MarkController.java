@@ -2,7 +2,7 @@ package com.javarush.stepanov.publisher.controller;
 
 
 import com.javarush.stepanov.publisher.model.mark.Mark;
-import com.javarush.stepanov.publisher.service.MarkService;
+import com.javarush.stepanov.publisher.service.entityservice.MarkService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
