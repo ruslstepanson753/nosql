@@ -9,6 +9,7 @@ import com.javarush.stepanov.publisher.repository.dbrepo.CreatorRepo;
 import com.javarush.stepanov.publisher.repository.dbrepo.MarkRepo;
 import com.javarush.stepanov.publisher.repository.dbrepo.StoryMarkRepo;
 import com.javarush.stepanov.publisher.repository.dbrepo.StoryRepo;
+import com.javarush.stepanov.publisher.repository.redisrepo.impl.StoryRedisRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,39 +19,57 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
 @AllArgsConstructor
 public class StoryService {
 
-    private final StoryRepo storyRepo;
+    private final StoryRepo repo;
     private final MarkRepo markRepo;
     private final StoryDto mapper;
     private final CreatorRepo creatorRepo;
     private final StoryMarkRepo storyMarkRepo;
+    private final StoryRedisRepo redisRepo;
 
     public List<Story.Out> getAll() {
-        return storyRepo
-                .findAll()
+        if (redisRepo.isAllCollectionInRedis()) {
+            return redisRepo.findAll();
+        }
+        List<Story.Out> listResult = repo.findAll()
                 .stream()
                 .map(mapper::out)
+                .filter(Objects::nonNull)  // Отсеиваем null
+                .peek(x -> {  // peek() вместо map(), т.к. это side-эффект
+                    if (!redisRepo.exists(x.getId())) {
+                        redisRepo.save(x.getId(), x);  // Сохраняем каждый элемент
+                    }
+                })
                 .toList();
+        redisRepo.setAllCollectionInRedis(true);
+        return listResult;
     }
 
     public List<Story.Out> getAll(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return storyRepo.
+        return repo.
                 findAll(pageable)
                 .map(mapper::out)
                 .getContent();
     }
 
     public Story.Out get(Long id) {
-        return storyRepo
-                .findById(id)
-                .map(mapper::out)
-                .orElseThrow();
+        if (redisRepo.exists(id)) {
+            return redisRepo.findById(id);
+        }else {
+            Story.Out result = repo
+                    .findById(id)
+                    .map(mapper::out)
+                    .orElseThrow();
+            redisRepo.save(id, result);
+            return result;
+        }
     }
 
     @Transactional
@@ -61,7 +80,7 @@ public class StoryService {
         Story story = mapper.in(input);
         story.setCreated(LocalDateTime.now());
         story.setModified(LocalDateTime.now());
-        Story storyWithId = storyRepo.save(story);
+        Story storyWithId = repo.save(story);
         if(marksString!=null) {
             for (String markName : marksString) {
                 System.out.println();
@@ -75,9 +94,11 @@ public class StoryService {
                 }
             }
         }
-        Story.Out result = mapper.out(storyRepo.save(storyWithId));
+        Story.Out result = mapper.out(repo.save(storyWithId));
         result.setMarks(marksString);
-        return result;    }
+        redisRepo.save(result.getId(), result);
+        return result;
+    }
 
     private void chekCreator(Story.In input) {
         Creator creator2 = (Creator) creatorRepo.findById(input.getCreatorId()).orElse(null);
@@ -87,7 +108,7 @@ public class StoryService {
     }
 
     private void chekStory(Story.In input) {
-        Story story2 = (Story) storyRepo.findByTitle(input.getTitle()).orElse(null);
+        Story story2 = (Story) repo.findByTitle(input.getTitle()).orElse(null);
         if (story2 != null) {
             throw new IllegalArgumentException("Story with title '" + input.getTitle() + "' already exists");
         }
@@ -105,7 +126,7 @@ public class StoryService {
     }
 
     public Story.Out update(Story.In input) {
-        Story existing = storyRepo.findById(input.getId())
+        Story existing = repo.findById(input.getId())
                 .orElseThrow(() -> new NoSuchElementException("Creator not found with id: " + input.getId()));
         Story updated = mapper.in(input); // или частичное обновление:
          existing.setCreatorId(input.getCreatorId());
@@ -113,13 +134,16 @@ public class StoryService {
          existing.setContent(input.getContent());
          existing.setCreated(input.getCreated());
          existing.setModified(LocalDateTime.now());
-        return mapper.out(storyRepo.save(updated));
+        Story.Out result = mapper.out(repo.save(updated));
+        redisRepo.save(result.getId(), result);
+        return result;
     }
 
     @Transactional
     public void delete(Long id) {
-        Story story = storyRepo.findById(id).orElseThrow(()-> new NoSuchElementException("Story not found with id: " + id));
-        storyRepo.deleteById(id);
+        Story story = repo.findById(id).orElseThrow(()-> new NoSuchElementException("Story not found with id: " + id));
+        repo.deleteById(id);
+        redisRepo.delete(id);
     }
 
 }

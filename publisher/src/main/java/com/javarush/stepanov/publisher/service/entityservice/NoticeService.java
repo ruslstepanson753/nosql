@@ -6,6 +6,7 @@ import com.javarush.stepanov.publisher.model.notice.Notice;
 import com.javarush.stepanov.publisher.model.story.Story;
 import com.javarush.stepanov.publisher.repository.dbrepo.NoticeRepo;
 import com.javarush.stepanov.publisher.repository.dbrepo.StoryRepo;
+import com.javarush.stepanov.publisher.repository.redisrepo.impl.NoticeRedisRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -21,12 +23,23 @@ public class NoticeService {
     private final StoryRepo storyRepo;
     private final NoticeRepo repo;
     private final NoticeDto mapper;
+    private final NoticeRedisRepo redisRepo;
 
     public List<Notice.Out> getAll() {
+        if (redisRepo.isAllCollectionInRedis()){
+            return redisRepo.findAll();
+        }
+        redisRepo.setAllCollectionInRedis(true);
         return repo
                 .findAll()
                 .stream()
                 .map(mapper::out)
+                .filter(Objects::nonNull)  // Отсеиваем null
+                .peek(x -> {  // peek() вместо map(), т.к. это side-эффект
+                    if (!redisRepo.exists(x.getId())) {
+                        redisRepo.save(x.getId(), x);  // Сохраняем каждый элемент
+                    }
+                })
                 .toList();
     }
 

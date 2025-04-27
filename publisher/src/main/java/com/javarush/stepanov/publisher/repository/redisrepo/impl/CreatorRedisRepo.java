@@ -1,6 +1,7 @@
-package com.javarush.stepanov.publisher.repository.redisrepo;
+package com.javarush.stepanov.publisher.repository.redisrepo.impl;
 
 import com.javarush.stepanov.publisher.model.creator.Creator;
+import com.javarush.stepanov.publisher.repository.redisrepo.RedisRepositoryImpl;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 

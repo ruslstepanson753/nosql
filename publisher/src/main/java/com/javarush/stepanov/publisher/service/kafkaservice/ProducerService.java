@@ -3,6 +3,7 @@ package com.javarush.stepanov.publisher.service.kafkaservice;
 import com.javarush.stepanov.publisher.mapper.NoticeDto;
 import com.javarush.stepanov.publisher.model.notice.Kafka;
 import com.javarush.stepanov.publisher.model.notice.Notice;
+import com.javarush.stepanov.publisher.repository.redisrepo.impl.NoticeRedisRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,19 @@ public class ProducerService {
 
     private final KafkaResponseService responseService;
 
+    private final NoticeRedisRepo redisRepo;
+
     @Value("${topic.name}")
     private String topicName;
 
-    public ProducerService(NoticeDto mapper, NoticeDto mapper1, KafkaTemplate<String, Kafka> kafkaTemplate, KafkaResponseService kafkaResponseService) {
-        this.mapper = mapper1;
+    public ProducerService(NoticeDto mapper,
+                           KafkaTemplate<String, Kafka> kafkaTemplate,
+                           KafkaResponseService kafkaResponseService,
+                           NoticeRedisRepo redisRepo) {
+        this.mapper = mapper;
         this.kafkaTemplate = kafkaTemplate;
         this.responseService = kafkaResponseService;
+        this.redisRepo = redisRepo;
     }
 
     public void sendMessage(String key, Kafka message) {
@@ -45,24 +52,36 @@ public class ProducerService {
 
         Kafka kafka = getKafka(id, method, state, out);
         sendMessage(String.valueOf(id),kafka);
+        redisRepo.save(out.getId(), out);
         return out;
     }
 
     public Notice.Out kafkaGet(Long id) {
+        if (redisRepo.exists(id)) {
+            return redisRepo.findById(id);
+        }
         String method = "GET";
         String state = "PENDING";
 
         Kafka kafka = getKafka(id, method, state, null);
-        return getOut(id, kafka);
+        Notice.Out result = getOut(id, kafka);
+        redisRepo.save(result.getId(), result);
+        return result;
     }
 
     public List<Notice.Out> kafkaGetAll() {
+        if (redisRepo.isAllCollectionInRedis()){
+            return redisRepo.findAll();
+        }
         Long id = UUID.randomUUID().getMostSignificantBits();
         String method = "GET_ALL";
         String state = "PENDING";
 
         Kafka kafka = getKafka(id, method, state, null);
-        return getOuts(id, kafka);
+        List<Notice.Out> result = getOuts(id, kafka);
+        result.forEach(r -> redisRepo.save(r.getId(), r));
+        redisRepo.setAllCollectionInRedis(true);
+        return result;
     }
 
     public Notice.Out kafkaPut(Notice.In input) {
@@ -72,7 +91,9 @@ public class ProducerService {
         Notice.Out out = mapper.getOutFromIn(input);
 
         Kafka kafka = getKafka(id, method, state, out);
-        return getOut(id, kafka);
+        Notice.Out result = getOut(id, kafka);
+        redisRepo.save(result.getId(), result);
+        return result;
     }
 
     public Notice.Out kafkaDelete(Long id) {
@@ -80,7 +101,9 @@ public class ProducerService {
         String state = "PENDING";
 
         Kafka kafka = getKafka(id, method, state, null);
-        return getOut(id, kafka);
+        Notice.Out result = getOut(id, kafka);
+        redisRepo.delete(id);
+        return result;
     }
 
     private static Kafka getKafka(Long id, String method, String state, Notice.Out out) {

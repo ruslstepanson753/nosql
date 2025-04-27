@@ -3,7 +3,7 @@ package com.javarush.stepanov.publisher.service.entityservice;
 import com.javarush.stepanov.publisher.mapper.CreatorDto;
 import com.javarush.stepanov.publisher.model.creator.Creator;
 import com.javarush.stepanov.publisher.repository.dbrepo.CreatorRepo;
-import com.javarush.stepanov.publisher.repository.redisrepo.CreatorRedisRepo;
+import com.javarush.stepanov.publisher.repository.redisrepo.impl.CreatorRedisRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
@@ -12,8 +12,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @AllArgsConstructor

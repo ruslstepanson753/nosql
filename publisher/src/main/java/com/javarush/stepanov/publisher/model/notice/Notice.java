@@ -40,7 +40,7 @@ public class Notice {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Out{
+    public static class Out implements Serializable {
         Long id;
         Long storyId;
         String content;
