@@ -60,8 +60,8 @@ public class RedisRepositoryImpl<ID, T> implements RedisRepository<ID, T> {
     }
 
     @Override
-    public List<T> findAll(String pattern) {
-        Set<String> keys = redisTemplate.keys(keyPrefix + ":" + pattern);
+    public List<T> findAll() {
+        Set<String> keys = redisTemplate.keys(keyPrefix + ":*");
         if (keys != null && !keys.isEmpty()) {
             return redisTemplate.opsForValue().multiGet(keys);
         }

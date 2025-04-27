@@ -15,6 +15,6 @@ public interface RedisRepository<ID, T> {
     void delete(ID id);
     boolean exists(ID id);
     void saveWithExpiration(ID id, T entity, long timeout, TimeUnit timeUnit);
-    List<T> findAll(String pattern);
+    List<T> findAll();
 }
 
