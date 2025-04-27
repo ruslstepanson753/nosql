@@ -21,10 +21,16 @@ spring:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: notice-consumer-group
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      connect-timeout: 600
 server:
   port: 24110
 topic:
   name: InTopic
+
 
 
 
