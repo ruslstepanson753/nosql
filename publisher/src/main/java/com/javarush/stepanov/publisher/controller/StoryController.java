@@ -36,7 +36,7 @@ public class StoryController {
     public Story.Out createStory(@RequestBody @Valid Story.In input) {
         try {
             return service.create(input);
-        } catch (NoSuchElementException e) {
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }

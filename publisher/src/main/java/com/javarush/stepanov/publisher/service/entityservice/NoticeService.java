@@ -62,14 +62,16 @@ public class NoticeService {
         Notice notice = mapper.in(input);
         Long storyId = notice.getStoryId();
         Story story = storyRepo.findById(storyId).orElseThrow(NoSuchElementException::new);
-        List<Notice> list= repo.findAll();
-        for(Notice NoticeInList : list ){
-            if((NoticeInList.getId().equals(notice.getId()))){
-                throw new NoSuchElementException();
-            }
-        }
+        chekExceptionForCreate(input);
         return mapper.out(
                 repo.save(notice));
+    }
+
+    public void chekExceptionForCreate(Notice.In notice) {
+        Long storyId = notice.getStoryId();
+        if (!storyRepo.existsById(storyId)) {
+            throw new NoSuchElementException();
+        }
     }
 
     public Notice.Out update(Notice.In input) {

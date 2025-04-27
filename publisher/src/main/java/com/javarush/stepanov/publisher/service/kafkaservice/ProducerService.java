@@ -70,9 +70,6 @@ public class ProducerService {
     }
 
     public List<Notice.Out> kafkaGetAll() {
-        if (redisRepo.isAllCollectionInRedis()){
-            return redisRepo.findAll();
-        }
         Long id = UUID.randomUUID().getMostSignificantBits();
         String method = "GET_ALL";
         String state = "PENDING";

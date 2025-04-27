@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,14 +23,16 @@ public class NoticeController {
     private final DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
     private final WebClient webClient;
     private final ProducerService kafkaProducerService;
+    private final NoticeService noticeService;
 
     public NoticeController(NoticeService service,
                             DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration,
-                            ProducerService kafkaProducerService) {
+                            ProducerService kafkaProducerService, NoticeService noticeService) {
         this.service = service;
         this.dataSourceTransactionManagerAutoConfiguration = dataSourceTransactionManagerAutoConfiguration;
         this.webClient = WebClient.create("http://localhost:24130");
         this.kafkaProducerService = kafkaProducerService;
+        this.noticeService = noticeService;
     }
 
     @GetMapping("/{id}")
@@ -47,6 +50,11 @@ public class NoticeController {
     @ResponseStatus(HttpStatus.CREATED)
     public Notice.Out createNotice(@RequestBody @Valid Notice.In input) {
         log.info("Sending to 24130: {}", input);
+        try{
+            noticeService.chekExceptionForCreate(input);
+        }catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         return kafkaProducerService.kafkaPost(input);
     }
 
