@@ -55,7 +55,11 @@ public class CreatorController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> deleteCreator(@PathVariable Long id) {
-        service.delete(id);
+        try {
+            service.delete(id);
+        }catch (RuntimeException e){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         return ResponseEntity.noContent().build();
     }
 }

@@ -10,7 +10,9 @@ import com.javarush.stepanov.publisher.repository.redisrepo.impl.NoticeRedisRepo
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -84,6 +86,9 @@ public class NoticeService {
     }
 
     public void delete(Long id) {
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         repo.deleteById(id);
     }
 

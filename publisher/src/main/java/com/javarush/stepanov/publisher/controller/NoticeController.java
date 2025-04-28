@@ -67,6 +67,10 @@ public class NoticeController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Notice.Out deleteNotice(@PathVariable Long id) {
-        return kafkaProducerService.kafkaDelete(id);
+        try {
+            return kafkaProducerService.kafkaDelete(id);
+        }catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 }

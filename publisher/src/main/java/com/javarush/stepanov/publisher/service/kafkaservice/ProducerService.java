@@ -94,13 +94,19 @@ public class ProducerService {
     }
 
     public Notice.Out kafkaDelete(Long id) {
+        checkDeleteValid(id);
         String method = "DELETE";
         String state = "PENDING";
 
         Kafka kafka = getKafka(id, method, state, null);
         Notice.Out result = getOut(id, kafka);
         redisRepo.delete(id);
+
         return result;
+    }
+
+    private void checkDeleteValid(Long id) {
+
     }
 
     private static Kafka getKafka(Long id, String method, String state, Notice.Out out) {

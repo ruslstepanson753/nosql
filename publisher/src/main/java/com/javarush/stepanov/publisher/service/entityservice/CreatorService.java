@@ -5,9 +5,11 @@ import com.javarush.stepanov.publisher.model.creator.Creator;
 import com.javarush.stepanov.publisher.repository.dbrepo.CreatorRepo;
 import com.javarush.stepanov.publisher.repository.redisrepo.impl.CreatorRedisRepo;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -89,7 +91,7 @@ public class CreatorService {
 
     public void delete(Long id) {
         if (repo.findById(id).isEmpty()) {
-            throw new NoSuchElementException("Creator not found with id: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         redisRepo.delete(id);
         repo.deleteById(id);

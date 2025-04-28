@@ -25,9 +25,7 @@ public class MarkService {
     private final MarkRedisRepo redisRepo;
 
     public List<Mark.Out> getAll() {
-        if (redisRepo.isAllCollectionInRedis()) {
-            return redisRepo.findAll();
-        }
+
         List<Mark.Out> listResult = repo.findAll()
                 .stream()
                 .map(mapper::out)
@@ -94,10 +92,7 @@ public class MarkService {
     }
 
     public Mark.Out delete(Long id) {
-        Mark entity = repo.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "mark with id '" + id + " not exists"
-        ));
+        Mark entity = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         repo.deleteById(id);
         return mapper.out(entity);
     }

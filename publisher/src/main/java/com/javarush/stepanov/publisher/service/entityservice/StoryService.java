@@ -13,8 +13,10 @@ import com.javarush.stepanov.publisher.repository.redisrepo.impl.StoryRedisRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -141,9 +143,11 @@ public class StoryService {
 
     @Transactional
     public void delete(Long id) {
-        Story story = repo.findById(id).orElseThrow(()-> new NoSuchElementException("Story not found with id: " + id));
+        Story story = repo.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
         repo.deleteById(id);
         redisRepo.delete(id);
     }
+
+
 
 }
