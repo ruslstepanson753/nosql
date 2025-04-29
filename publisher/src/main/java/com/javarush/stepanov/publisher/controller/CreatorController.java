@@ -14,8 +14,10 @@ import java.util.NoSuchElementException;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1.0/creators")
+@RequestMapping(CreatorController.ENDPOINT_CREATORS)
 public class CreatorController {
+
+    public static final String ENDPOINT_CREATORS = "/api/v1.0/creators";
 
     private final CreatorService service;
 
@@ -27,7 +29,7 @@ public class CreatorController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Creator.Out> getAllCreators2(
+    public List<Creator.Out> getAllCreators(
     )   {
         return service.getAll();
     }
