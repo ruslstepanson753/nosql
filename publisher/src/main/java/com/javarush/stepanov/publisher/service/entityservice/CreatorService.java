@@ -24,24 +24,25 @@ public class CreatorService {
     private final CreatorRedisRepo redisRepo;
 
     public List<Creator.Out> getAll() {
-//        if (redisRepo.isAllCollectionInRedis()) {
-//            return redisRepo.findAll();
-//        }
-//        List<Creator.Out> listResult = repo.findAll()
-//                .stream()
-//                .map(mapper::out)
-//                .filter(Objects::nonNull)  // Отсеиваем null
-//                .peek(x -> {  // peek() вместо map(), т.к. это side-эффект
-//                    if (!redisRepo.exists(x.id)) {
-//                        redisRepo.save(x.id, x);  // Сохраняем каждый элемент
-//                    }
-//                })
-//                .toList();
-//        redisRepo.setAllCollectionInRedis(true);
-        return repo.findAll()
+        if (redisRepo.isAllCollectionInRedis()) {
+            return redisRepo.findAll();
+        }
+        List<Creator.Out> listResult = repo.findAll()
                 .stream()
                 .map(mapper::out)
+                .filter(Objects::nonNull)  // Отсеиваем null
+                .peek(x -> {  // peek() вместо map(), т.к. это side-эффект
+                    if (!redisRepo.exists(x.id)) {
+                        redisRepo.save(x.id, x);  // Сохраняем каждый элемент
+                    }
+                })
                 .toList();
+        redisRepo.setAllCollectionInRedis(true);
+        return listResult;
+//        return repo.findAll()
+//                .stream()
+//                .map(mapper::out)
+//                .toList();
     }
 
     public List<Creator.Out> getAll(int pageNumber, int pageSize) {
