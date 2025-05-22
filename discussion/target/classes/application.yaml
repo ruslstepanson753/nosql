@@ -2,11 +2,28 @@ spring:
   application:
     name: discussion
   cassandra:
-    keyspace-name: keyspace_name
+    keyspace-name: distcomp
     contact-points: localhost
     port: 9042
     local-datacenter: datacenter1  # Укажите ваш дата-центр
+  datasource:
+    name: cassandra_datasource
+    url: jdbc:cassandra://localhost:9042/distcomp?localdatacenter=datacenter1
+    driver-class-name: com.ing.data.cassandra.jdbc.CassandraDriver
+    hikari:
+      minimum-idle: 2
+  liquibase:
+    url: jdbc:cassandra://localhost:9042/distcomp?localdatacenter=datacenter1&compliancemode=Liquibase
+    driver-class-name: com.ing.data.cassandra.jdbc.CassandraDriver
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notice-consumer-group
 server:
   port: 24130
+topic:
+  name: OutTopic
 
 
