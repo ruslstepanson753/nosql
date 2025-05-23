@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1.0/creators")
+@RequestMapping({"/api/v1.0/creators","/api/v2.0/creators"})
 public class CreatorController {
 
     private final CreatorService service;
