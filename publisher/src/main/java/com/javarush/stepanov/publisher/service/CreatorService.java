@@ -2,8 +2,10 @@ package com.javarush.stepanov.publisher.service;
 
 import com.javarush.stepanov.publisher.mapper.CreatorDto;
 import com.javarush.stepanov.publisher.model.creator.Creator;
+import com.javarush.stepanov.publisher.model.creator.Role;
 import com.javarush.stepanov.publisher.repository.impl.CreatorRepo;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,7 @@ public class CreatorService {
 
     private final CreatorRepo repo;
     private final CreatorDto mapper;
+    private final PasswordEncoder passwordEncoder;
 
     public List<Creator.Out> getAll() {
         return repo
@@ -49,6 +52,11 @@ public class CreatorService {
                 throw new NoSuchElementException();
             }
         }
+        if(creator.getRole()==null){
+            creator.setRole(Role.USER);
+        }
+        String dbPass = passwordEncoder.encode(input.getPassword());
+        creator.setPassword(dbPass);
         return mapper.out(
                 repo.save(creator));
     }

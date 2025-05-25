@@ -24,7 +24,9 @@ databaseChangeLog:
               - column:
                   name: lastname
                   type: VARCHAR(255)
-
+              - column:
+                  name: role
+                  type: VARCHAR(20)
   - changeSet:
       id: 2
       author: generated
