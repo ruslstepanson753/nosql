@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1.0/creators")
+@RequestMapping({"/api/v1.0/creators","/api/v2.0/creators"})
 public class CreatorController {
 
     private final CreatorService service;
@@ -36,6 +36,7 @@ public class CreatorController {
     @ResponseStatus(HttpStatus.CREATED)
     public Creator.Out createCreator(@RequestBody @Valid Creator.In input) {
         try {
+            System.out.println();
             return service.create(input);
         }catch (NoSuchElementException e){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);

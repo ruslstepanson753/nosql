@@ -52,7 +52,11 @@ public class NoticeController {
     @ResponseStatus(HttpStatus.CREATED)
     public Notice.Out createNotice(@RequestBody @Valid Notice.In input) {
         log.info("Sending to 24130: {}", input);
-        return kafkaProducerService.kafkaPost(input);
+        try{
+            return kafkaProducerService.kafkaPost(input);
+        }catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @PutMapping

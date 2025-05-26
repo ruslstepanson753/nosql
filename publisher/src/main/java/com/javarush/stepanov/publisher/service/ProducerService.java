@@ -3,6 +3,7 @@ package com.javarush.stepanov.publisher.service;
 import com.javarush.stepanov.publisher.mapper.NoticeDto;
 import com.javarush.stepanov.publisher.model.notice.Kafka;
 import com.javarush.stepanov.publisher.model.notice.Notice;
+import com.javarush.stepanov.publisher.repository.impl.StoryRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,16 @@ public class ProducerService {
     private final KafkaTemplate<String, Kafka> kafkaTemplate;
 
     private final KafkaResponseService responseService;
+    private final StoryRepo storyRepo;
 
     @Value("${topic.name}")
     private String topicName;
 
-    public ProducerService(NoticeDto mapper, NoticeDto mapper1, KafkaTemplate<String, Kafka> kafkaTemplate, KafkaResponseService kafkaResponseService) {
+    public ProducerService(NoticeDto mapper, NoticeDto mapper1, KafkaTemplate<String, Kafka> kafkaTemplate, KafkaResponseService kafkaResponseService, StoryRepo storyRepo) {
         this.mapper = mapper1;
         this.kafkaTemplate = kafkaTemplate;
         this.responseService = kafkaResponseService;
+        this.storyRepo = storyRepo;
     }
 
     public void sendMessage(String key, Kafka message) {
@@ -37,6 +40,8 @@ public class ProducerService {
     }
 
     public Notice.Out kafkaPost(Notice.In input) {
+        Long storyId = input.getStoryId();
+        storyRepo.findById(storyId).orElseThrow();
         long id = Math.abs(UUID.randomUUID().getMostSignificantBits());
         String method = "POST";
         String state = "PENDING";
