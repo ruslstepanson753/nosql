@@ -20,11 +20,8 @@
 -  команду:
   docker run --name cassandra -d -p 9042:9042 cassandra:latest
 
--  команду:
+-  команду (перед запуском подождать 1 мин.):
   docker exec -it cassandra cqlsh
-
--  команду:
-   docker exec -it cassandra cqlsh
 
 -  команду:
    CREATE KEYSPACE IF NOT EXISTS distcomp
@@ -49,16 +46,11 @@
    confluentinc/cp-zookeeper:7.3.2
 
 -  команду:
-   --network=kafkanet `
-    --name=kafka `
-   -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 `
-    -e KAFKA_ADVERTISED_LISTENERS="PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092" `
-   -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP="PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT" `
-    -e KAFKA_LISTENERS="PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092" `
-   -e KAFKA_INTER_BROKER_LISTENER_NAME="PLAINTEXT" `
-    -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 `
-   -p 9092:9092 `
-   confluentinc/cp-kafka:7.3.2
+    docker run -d --network=kafkanet --name=kafka -e `
+    KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e `
+    KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 -e `
+    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 -p 9092:9092 `
+    confluentinc/cp-kafka
 
 -  команду:
    docker run -d --name redis -p 6379:6379 redis
@@ -75,7 +67,7 @@
   -Руслан
   -stepanovruslan@mail.ru
 
-6. Запустить тесты
+6. Запустить тесты(в целях экономии времени можно запустить result.mp4 и увидеть результат)
 
     //Отчёт по выполнению задач:
 
@@ -113,10 +105,7 @@ IN ENGLISH LANGUAGE
     Command:
     docker run --name cassandra -d -p 9042:9042 cassandra:latest
 
-    Command:
-    docker exec -it cassandra cqlsh
-
-    Command:
+    Command (wait before running command 1 minute):
     docker exec -it cassandra cqlsh
 
     Command:
@@ -139,12 +128,11 @@ IN ENGLISH LANGUAGE
     confluentinc/cp-zookeeper:7.3.2
 
     Command:
-    --network=kafkanet --name=kafka
-    -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e KAFKA_ADVERTISED_LISTENERS="PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092"
-    -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP="PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT" -e KAFKA_LISTENERS="PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092"
-    -e KAFKA_INTER_BROKER_LISTENER_NAME="PLAINTEXT" -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-    -p 9092:9092 `
-    confluentinc/cp-kafka:7.3.2
+    docker run -d --network=kafkanet --name=kafka -e `
+    KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e `
+    KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 -e `
+    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 -p 9092:9092 `
+    confluentinc/cp-kafka
 
     Command:
     docker run -d --name redis -p 6379:6379 redis
@@ -161,7 +149,7 @@ IN ENGLISH LANGUAGE
   -Ruslan
   -stepanovruslan@mail.ru
 
-6. Run the tests
+6. Run the tests (to save time you can run result.mp4 and see the result)
 
 //Task completion report:
 
