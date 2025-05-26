@@ -1,7 +1,7 @@
 package com.javarush.stepanov.publisher.security;
 
 import com.javarush.stepanov.publisher.model.creator.Creator;
-import com.javarush.stepanov.publisher.repository.impl.CreatorRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.CreatorRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

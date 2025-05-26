@@ -1,7 +1,6 @@
-package com.javarush.stepanov.publisher.repository.impl;
+package com.javarush.stepanov.publisher.repository.dbrepo;
 
 import com.javarush.stepanov.publisher.model.creator.Creator;
-import io.micrometer.observation.ObservationFilter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

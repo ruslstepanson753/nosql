@@ -2,7 +2,7 @@ package com.javarush.stepanov.publisher.service;
 
 import com.javarush.stepanov.publisher.mapper.MarkDto;
 import com.javarush.stepanov.publisher.model.mark.Mark;
-import com.javarush.stepanov.publisher.repository.impl.MarkRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.MarkRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

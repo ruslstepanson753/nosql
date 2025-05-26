@@ -3,7 +3,7 @@ package com.javarush.stepanov.publisher.service;
 import com.javarush.stepanov.publisher.mapper.NoticeDto;
 import com.javarush.stepanov.publisher.model.notice.Kafka;
 import com.javarush.stepanov.publisher.model.notice.Notice;
-import com.javarush.stepanov.publisher.repository.impl.StoryRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.StoryRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -54,6 +54,7 @@ public class ProducerService {
     }
 
     public Notice.Out kafkaGet(Long id) {
+
         String method = "GET";
         String state = "PENDING";
 

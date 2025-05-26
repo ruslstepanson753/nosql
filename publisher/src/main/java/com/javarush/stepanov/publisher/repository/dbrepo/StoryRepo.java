@@ -1,4 +1,4 @@
-package com.javarush.stepanov.publisher.repository.impl;
+package com.javarush.stepanov.publisher.repository.dbrepo;
 
 import com.javarush.stepanov.publisher.model.story.Story;
 import jakarta.validation.constraints.Size;

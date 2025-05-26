@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -90,7 +91,7 @@ public class Creator  implements UserDetails {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Out{
+    public static class Out implements Serializable {
         public Long id;
         public String login;
         public String password;

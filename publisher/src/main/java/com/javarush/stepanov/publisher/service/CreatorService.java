@@ -3,13 +3,11 @@ package com.javarush.stepanov.publisher.service;
 import com.javarush.stepanov.publisher.mapper.CreatorDto;
 import com.javarush.stepanov.publisher.model.creator.Creator;
 import com.javarush.stepanov.publisher.model.creator.Role;
-import com.javarush.stepanov.publisher.repository.impl.CreatorRepo;
+import com.javarush.stepanov.publisher.repository.dbrepo.CreatorRepo;
+import com.javarush.stepanov.publisher.repository.redisrepo.impl.CreatorRedisRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +24,7 @@ public class CreatorService {
     private final CreatorRepo repo;
     private final CreatorDto mapper;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
+    private final CreatorRedisRepo redisRepo;
 
     public List<Creator.Out> getAll() {
         return repo
@@ -36,19 +34,17 @@ public class CreatorService {
                 .toList();
     }
 
-    public List<Creator.Out> getAll(int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return repo.
-                findAll(pageable)
-                .map(mapper::out)
-                .getContent();
-    }
-
     public Creator.Out get(Long id) {
-        return repo
-                .findById(id)
-                .map(mapper::out)
-                .orElseThrow();
+        if (redisRepo.exists(id)) {
+            return redisRepo.findById(id);
+        }else {
+            Creator.Out result = repo
+                    .findById(id)
+                    .map(mapper::out)
+                    .orElseThrow();
+            redisRepo.save(id, result);
+            return result;
+        }
     }
 
     public Creator.Out create(Creator.In input) {
@@ -64,8 +60,10 @@ public class CreatorService {
         }
         String dbPass = passwordEncoder.encode(input.getPassword());
         creator.setPassword(dbPass);
-        return mapper.out(
+        Creator.Out result = mapper.out(
                 repo.save(creator));
+        redisRepo.save(result.getId(), result);
+        return result;
     }
 
     public Creator.Out update(Creator.In input) {
@@ -76,23 +74,16 @@ public class CreatorService {
         existing.setPassword(dbPass);
          existing.setFirstname(input.getFirstname());
          existing.setLastname(input.getLastname());
-
-        Creator.Out out = mapper.out(repo.save(existing));
-
-//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-//                input.getLogin(),
-//                dbPass);
-//        Authentication authentication = authenticationManager.authenticate(
-//                authenticationToken);
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return out;
+        Creator.Out result = mapper.out(repo.save(existing));
+        redisRepo.save(result.getId(), result);
+        return result;
     }
 
     public void delete(Long id) {
         if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        redisRepo.delete(id);
         repo.deleteById(id);
     }
 
