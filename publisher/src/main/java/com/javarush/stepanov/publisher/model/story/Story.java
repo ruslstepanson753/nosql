@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,7 +60,7 @@ public class Story {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Out {
+    public static class Out  implements Serializable {
         Long id;
         Long creatorId;
         String title;

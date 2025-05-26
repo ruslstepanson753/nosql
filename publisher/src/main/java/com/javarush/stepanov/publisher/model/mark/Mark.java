@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class Mark {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Out {
+    public static class Out implements Serializable {
         Long id;
         String name;
         Set<Long> storyIds; // ID связанных историй

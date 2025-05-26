@@ -1,9 +1,13 @@
 package com.javarush.stepanov.publisher.service;
 
 import com.javarush.stepanov.publisher.mapper.NoticeDto;
+import com.javarush.stepanov.publisher.model.creator.Creator;
 import com.javarush.stepanov.publisher.model.notice.Kafka;
 import com.javarush.stepanov.publisher.model.notice.Notice;
+import com.javarush.stepanov.publisher.model.story.Story;
+import com.javarush.stepanov.publisher.repository.dbrepo.NoticeRepo;
 import com.javarush.stepanov.publisher.repository.dbrepo.StoryRepo;
+import com.javarush.stepanov.publisher.repository.redisrepo.impl.NoticeRedisRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -24,15 +28,19 @@ public class ProducerService {
 
     private final KafkaResponseService responseService;
     private final StoryRepo storyRepo;
+    private final NoticeRepo noticeRepo;
+    private final NoticeRedisRepo noticeRedisRepo;
 
     @Value("${topic.name}")
     private String topicName;
 
-    public ProducerService(NoticeDto mapper, NoticeDto mapper1, KafkaTemplate<String, Kafka> kafkaTemplate, KafkaResponseService kafkaResponseService, StoryRepo storyRepo) {
+    public ProducerService(NoticeDto mapper, NoticeDto mapper1, KafkaTemplate<String, Kafka> kafkaTemplate, KafkaResponseService kafkaResponseService, StoryRepo storyRepo, NoticeRepo noticeRepo, NoticeRedisRepo noticeRedisRepo) {
         this.mapper = mapper1;
         this.kafkaTemplate = kafkaTemplate;
         this.responseService = kafkaResponseService;
         this.storyRepo = storyRepo;
+        this.noticeRepo = noticeRepo;
+        this.noticeRedisRepo = noticeRedisRepo;
     }
 
     public void sendMessage(String key, Kafka message) {
@@ -47,17 +55,18 @@ public class ProducerService {
         String state = "PENDING";
         Notice.Out out = mapper.getOutFromIn(input);
         out.setId(id);
-
         Kafka kafka = getKafka(id, method, state, out);
         sendMessage(String.valueOf(id),kafka);
+        noticeRedisRepo.save(id, out);
         return out;
     }
 
     public Notice.Out kafkaGet(Long id) {
-
+        if (noticeRedisRepo.exists(id)) {
+            return noticeRedisRepo.findById(id);
+        }
         String method = "GET";
         String state = "PENDING";
-
         Kafka kafka = getKafka(id, method, state, null);
         return getOut(id, kafka);
     }
@@ -78,7 +87,9 @@ public class ProducerService {
         Notice.Out out = mapper.getOutFromIn(input);
 
         Kafka kafka = getKafka(id, method, state, out);
-        return getOut(id, kafka);
+        Notice.Out outResult = getOut(id, kafka);
+        noticeRedisRepo.save(id, outResult);
+        return outResult;
     }
 
     public Notice.Out kafkaDelete(Long id) {
@@ -86,6 +97,7 @@ public class ProducerService {
         String state = "PENDING";
 
         Kafka kafka = getKafka(id, method, state, null);
+        noticeRedisRepo.delete(id);
         return getOut(id, kafka);
     }
 

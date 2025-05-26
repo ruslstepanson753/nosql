@@ -30,14 +30,6 @@ public class NoticeService {
                 .toList();
     }
 
-    public List<Notice.Out> getAll(int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return repo.
-                findAll(pageable)
-                .map(mapper::out)
-                .getContent();
-    }
-
     public Notice.Out get(Long id) {
         return repo
                 .findById(id)
