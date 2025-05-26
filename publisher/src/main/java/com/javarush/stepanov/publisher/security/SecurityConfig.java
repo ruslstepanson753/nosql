@@ -1,5 +1,6 @@
 package com.javarush.stepanov.publisher.security;
 
+import com.javarush.stepanov.publisher.exception.CustomAccessDeniedHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,11 +34,13 @@ public class SecurityConfig {
     private final JwtAuthEntryPoint authEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final DebugSecurityContextFilter debugSecurityContextFilter;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
-    public SecurityConfig(JwtAuthEntryPoint authEntryPoint, JwtAuthenticationFilter jwtAuthenticationFilter, DebugSecurityContextFilter debugSecurityContextFilter) {
+    public SecurityConfig(JwtAuthEntryPoint authEntryPoint, JwtAuthenticationFilter jwtAuthenticationFilter, DebugSecurityContextFilter debugSecurityContextFilter, CustomAccessDeniedHandler accessDeniedHandler) {
         this.authEntryPoint = authEntryPoint;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.debugSecurityContextFilter = debugSecurityContextFilter;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
     @Bean
@@ -47,8 +50,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(authEntryPoint)
-                        .accessDeniedHandler((request, response, accessDeniedException) ->
-                                response.setStatus(HttpStatus.FORBIDDEN.value()))
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
