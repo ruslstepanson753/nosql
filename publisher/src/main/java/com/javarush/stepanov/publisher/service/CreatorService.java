@@ -5,10 +5,16 @@ import com.javarush.stepanov.publisher.model.creator.Creator;
 import com.javarush.stepanov.publisher.model.creator.Role;
 import com.javarush.stepanov.publisher.repository.impl.CreatorRepo;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -20,6 +26,7 @@ public class CreatorService {
     private final CreatorRepo repo;
     private final CreatorDto mapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     public List<Creator.Out> getAll() {
         return repo
@@ -64,15 +71,28 @@ public class CreatorService {
     public Creator.Out update(Creator.In input) {
         Creator existing = repo.findById(input.getId())
                 .orElseThrow(() -> new NoSuchElementException("Creator not found with id: " + input.getId()));
-        Creator updated = mapper.in(input); // или частичное обновление:
          existing.setLogin(input.getLogin());
-         existing.setPassword(input.getPassword());
+        String dbPass = passwordEncoder.encode(input.getPassword());
+        existing.setPassword(dbPass);
          existing.setFirstname(input.getFirstname());
          existing.setLastname(input.getLastname());
-        return mapper.out(repo.save(updated));
+
+        Creator.Out out = mapper.out(repo.save(existing));
+
+//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+//                input.getLogin(),
+//                dbPass);
+//        Authentication authentication = authenticationManager.authenticate(
+//                authenticationToken);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return out;
     }
 
     public void delete(Long id) {
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         repo.deleteById(id);
     }
 

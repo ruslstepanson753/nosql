@@ -62,10 +62,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v2.0/creators/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )                .anonymous(AbstractHttpConfigurer::disable)
-
-                //.addFilterBefore(new ExceptionTranslationFilter(authenticationEntryPoint), SecurityContextHolderFilter.class)
-                //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                //.addFilterAfter(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .addFilterAfter(debugSecurityContextFilter, JwtAuthenticationFilter.class)
         ;
         return http.build();
