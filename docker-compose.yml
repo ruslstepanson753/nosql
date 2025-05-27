@@ -1,0 +1,69 @@
+version: '3.8'
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: distcomp       # ← здесь нужное имя базы
+    ports:
+      - "5432:5432"
+    networks:
+      - distcomp-network
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - distcomp-network
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - distcomp-network
+    restart: unless-stopped
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - distcomp-network
+    restart: unless-stopped
+
+  publisher:
+    build:
+      context: .
+      dockerfile: ./publisher/Dockerfile
+    container_name: publisher
+    depends_on:
+      - postgres-db
+      - kafka
+      - redis
+    ports:
+      - "8080:8080"
+    networks:
+      - distcomp-network
+    restart: unless-stopped
+
+networks:
+  distcomp-network:
+    driver: bridge

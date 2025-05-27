@@ -1,11 +1,25 @@
-FROM maven:3.8.4-amazoncorretto-21 as build
-WORKDIR app/publisher
-COPY . .
+# Build stage
+FROM maven:3.9.6-amazoncorretto-21 AS build
+
+WORKDIR /app
+
+# Копируем только нужные файлы для сборки
+COPY publisher/pom.xml .
+COPY publisher/src/ ./src/
+
+# Собираем приложение
 RUN mvn clean package -DskipTests
 
-FROM openjdk:21-jdk-slim
-WORKDIR /app/publisher
-COPY --from=build /app/publisher/target/jira-1.0.jar /app/
-COPY ./resources /app/publisher/resources
+# Runtime stage
+FROM amazoncorretto:21-alpine
+
+WORKDIR /app
+
+# Копируем собранный JAR
+COPY --from=build /app/target/publisher-*.jar /app/app.jar
+
+# Копируем ресурсы если нужно
+COPY --from=build /app/src/main/resources/ /app/resources/
+
 EXPOSE 8080
-CMD ["java", "-jar", "jira-1.0.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
