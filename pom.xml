@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>publisher</module>
         <module>discussion</module>
+        <module>publisher</module>
     </modules>
 
     <properties>
