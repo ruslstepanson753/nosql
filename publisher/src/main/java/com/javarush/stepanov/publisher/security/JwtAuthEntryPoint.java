@@ -28,6 +28,23 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
+        // Проверяем, не была ли уже установлена ошибка с другим статус-кодом
+        if (response.getStatus() != HttpServletResponse.SC_OK &&
+                response.getStatus() != HttpServletResponse.SC_UNAUTHORIZED) {
+
+            // Если статус уже установлен и это не 200 или 401, сохраняем его
+            String errorName = getErrorNameByStatus(response.getStatus());
+            errorHelper.writeErrorResponse(
+                    response,
+                    request,
+                    response.getStatus(),
+                    errorName,
+                    "Error: " + authException.getMessage()
+            );
+            return;
+        }
+
+        // Стандартная обработка 401
         errorHelper.writeErrorResponse(
                 response,
                 request,
@@ -35,5 +52,16 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
                 "Unauthorized",
                 "Authentication failed: " + authException.getMessage()
         );
+    }
+
+    private String getErrorNameByStatus(int statusCode) {
+        return switch (statusCode) {
+            case 400 -> "Bad Request";
+            case 401 -> "Unauthorized";
+            case 403 -> "Forbidden";
+            case 404 -> "Not Found";
+            case 500 -> "Internal Server Error";
+            default -> "Error";
+        };
     }
 }

@@ -3,8 +3,11 @@ package com.javrush.stepanov.discussion.service;
 import com.javrush.stepanov.discussion.mapper.NoticeDto;
 import com.javrush.stepanov.discussion.model.Kafka;
 import com.javrush.stepanov.discussion.model.Notice;
+import com.javrush.stepanov.discussion.model.NoticeKey;
+import com.javrush.stepanov.discussion.repo.NoticeCassandraRepository;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,7 @@ import java.util.List;
 public class ConsumerServiceDisc {
 
     private final NoticeServiceDisc noticeServiceDisc;
+    private final NoticeCassandraRepository repository;
     private final NoticeDto mapper;
     private final ProducerService producerService;
 
@@ -22,8 +26,9 @@ public class ConsumerServiceDisc {
     @Value("${topic.name}")
     private String topicName;
 
-    public ConsumerServiceDisc(NoticeServiceDisc noticeServiceDisc, NoticeDto mapper, ProducerService producerService) {
+    public ConsumerServiceDisc(NoticeServiceDisc noticeServiceDisc, NoticeCassandraRepository repository, NoticeDto mapper, ProducerService producerService) {
         this.noticeServiceDisc = noticeServiceDisc;
+        this.repository = repository;
         this.mapper = mapper;
         this.producerService = producerService;
     }
@@ -85,7 +90,14 @@ public class ConsumerServiceDisc {
         producerService.sendMessage(String.valueOf(id), putResposne);
     }
 
-    private void delete(Long id, Kafka kafka) {
+    private void delete(Long id, Kafka kafka) throws ChangeSetPersister.NotFoundException {
+        repository.findOneByKeyId(id).orElseThrow(
+                () -> {
+                    kafka.setState("NOT_FOUND");
+                    producerService.sendMessage(String.valueOf(id), kafka);
+                    return new ChangeSetPersister.NotFoundException(); // or any other exception
+                }
+        );
         noticeServiceDisc.delete(id);
         producerService.sendMessage(String.valueOf(id), kafka);
     }

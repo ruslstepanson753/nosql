@@ -9,8 +9,10 @@ import com.javarush.stepanov.publisher.repository.dbrepo.NoticeRepo;
 import com.javarush.stepanov.publisher.repository.dbrepo.StoryRepo;
 import com.javarush.stepanov.publisher.repository.redisrepo.impl.NoticeRedisRepo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -117,6 +119,9 @@ public class ProducerService {
             Kafka response = futureResponse.get(1, TimeUnit.SECONDS);
             if ("ERROR".equals(response.getState())) {
                 throw new RuntimeException("Ошибка при получении данных для id=" + id);
+            }
+            if ("NOT_FOUND".equals(response.getState())) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             }
             return response.getNotice();
         } catch (TimeoutException e) {
