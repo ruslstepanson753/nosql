@@ -1,6 +1,7 @@
 package com.javarush.stepanov.publisher.security;
 
 import com.javarush.stepanov.publisher.model.creator.Creator;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

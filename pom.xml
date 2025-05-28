@@ -11,7 +11,7 @@
 
     <modules>
         <module>discussion</module>
-        <module>publisher</module>
+<!--        <module>publisher</module>-->
     </modules>
 
     <properties>
